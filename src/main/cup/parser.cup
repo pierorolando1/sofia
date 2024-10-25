@@ -4,17 +4,51 @@ import java_cup.runtime.*;
 
 class Parser;
 
-terminal PLUS, TIMES, LPAREN, RPAREN;
-terminal Integer NUMBER;
+/* Terminals (tokens returned by the scanner) */
+terminal            DEFINE_SPACE, DEFINE_CAR, USE_SPACE, USE_CAR;
+terminal            SET_DIRECTION, MOVE_FORWARD, STOP, ROTATE;
+terminal            MOVE_FORWARD_STOP;
+terminal            ASSIGN, LPAREN, RPAREN, COMMA, SEMICOLON;
+terminal String     IDENTIFIER;
+terminal Double     NUMBER;
 
-non terminal Integer expr;
+/* Non-terminals */
+non terminal Object     program;
+non terminal Object     statement_list;
+non terminal Object     statement;
+non terminal Object     expression;
+non terminal Object     params;
 
-precedence left PLUS;
-precedence left TIMES;
+/* Precedences */
+precedence left ASSIGN;
 
-start with expr;
+/* The grammar */
+start with program;
 
-expr ::= expr:e1 PLUS expr:e2 {: RESULT = e1 + e2; :}
-      |  expr:e1 TIMES expr:e2 {: RESULT = e1 * e2; :}
-      |  LPAREN expr:e RPAREN {: RESULT = e; :}
-      |  NUMBER:n {: RESULT = n; :};
+program ::= statement_list {: System.out.println("Parsing completed successfully."); :};
+
+statement_list ::=
+    statement_list statement
+    |
+    statement
+;
+
+statement ::=
+    IDENTIFIER ASSIGN expression SEMICOLON
+    |
+    IDENTIFIER LPAREN params RPAREN SEMICOLON
+    |
+    IDENTIFIER LPAREN RPAREN SEMICOLON
+;
+
+expression ::=
+    NUMBER
+    |
+    IDENTIFIER
+;
+
+params ::=
+    expression
+    |
+    expression COMMA params
+;
